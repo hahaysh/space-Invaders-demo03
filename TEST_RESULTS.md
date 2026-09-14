@@ -34,10 +34,48 @@ TEST_PLAN/TEST_RESULTS와 최소 Skill 파일을 작성한 뒤 `skill` 도구에
 현재 세션의 파일 읽기를 Skill 호출 성공으로 표시하지 않는다.
 변경을 commit/push로 보존하고 coordinator에게 정확 feature SHA를 전달해
 같은 미병합 기능 브랜치 기준의 읽기 전용 검사 세션을 요청한다. 결과가 올 때까지 writer는 대기한다.
-이번 dev E2E·로컬 자연 시간·root/subpath 빌드 브라우저 검사는 아직 미실행이다.
+이 호출 시점에는 dev E2E·로컬 자연 시간·root/subpath 빌드 브라우저 검사가 미실행이었다.
 준비한 소유 dev는 launcher PID `31616`, Vite PID `30936`,
 `http://127.0.0.1:5173` HTTP 200을 확인한 뒤 대기 전 종료했다.
 검사 세션과 서버 소유권을 겹치지 않게 한다.
+
+### 같은 feature의 실제 Skill 발견·실행
+
+coordinator가 feature `3e722634d28434a1a049141c85f1e9ff57c7f4af`를 명시적 base로 연
+읽기 전용 검사 세션 `e56471ae-2892-48fe-95da-46388716a1db`의 첫 도구 호출에서
+`Skill "game-check" loaded successfully. Follow the instructions in the skill context.`
+응답과 8항 skill context 로딩이 확인됐다. 그 지침에 따른 실행 결과를 inspector와 coordinator가
+writer에게 전달했다. 기존 writer의 not found 실패는 그대로 남기며, 아래는 inspector 실행이다.
+
+| 실제 명령 | 결과 | 구분 |
+|---|---|---|
+| 설치 전 `npm run build` | 의존성 부재 실패 | 새 inspector worktree의 vite 미설치 |
+| `npm ci --no-audit --no-fund --registry=https://registry.npmjs.org` | 성공, 19 packages/2s | 기본 캐시 사용; writer의 별도 cold-cache 근거와 다름. lock SHA 불변 |
+| `npm test` | 11/11 | 모델 10 + 에셋 1 |
+| `npm run dev` 후 `npm run test:e2e -- --reporter=list --output=<inspector artifacts>\e2e-dev` | 14/14, 1.3분 | 실제 키/버튼·제어 clock·route·래스터 |
+| `npm run build` | 성공 | 기존과 동일 JS/CSS 산출물 |
+| root preview의 `GAME_URL`로 E2E 빌드용 grep | 6/6, 14.3초 | HTML·실제 키·카드·승리/재시작·PNG |
+| subpath preview의 `GAME_URL`로 같은 grep | 6/6, 14.9초 | 저장소 하위 경로 동일 dist |
+
+빌드용 grep은 `initial HTML|real button|Enter starts|score is an HTML|normal keyboard sweep|actual decoded PNG`.
+root는 `npm run preview`, 하위 경로는 `npm run preview -- --base=/space-Invaders-demo03/`.
+총 테스트 실행 37/37, 제품 검사 실패 0. 의도한 PNG 실패 route의 EncodingError 3건은 정상 오류 표출이다.
+전용 Chromium 자연 시간 시작 버튼→ArrowRight 250ms→Space 1500ms 후 40점/playing을 관찰했다.
+실제 800×600 Canvas 캡처에서 두 기체의 방향·몸체·날개·조종석·대비를 inspector가 관찰했다.
+카드 160×96, 라벨 12px/값 32px·750·tabular-nums·조작 분리를 확인했다.
+dev 두 PNG 200 image/png; root/subpath HTML/CSS/JS 200 및 정상 MIME,
+인라인 PNG 두 개 decode 99×75/93×84와 래스터 통과. 정상 화면의
+console error/pageerror/requestfailed/HTTP 오류/외부 요청은 모두 0이었다.
+
+이는 에이전트 검사이며 사람 플레이/자연 시간 전체 승리/OS 창 전환이 아니다.
+decode 자체의 독립 지연·거부, 편집 UI/스크롤 비간섭, PC 폭별 전체 기하학적 겹침은
+기존 검사만으로 확정하지 않는다. 05-02에서 보강할 검증 공백이며 확인된 제품 결함은 아니다.
+
+inspector 시작/종료 HEAD 동일, 추적파일·staged diff·status 모두 clean, commit/push 없음.
+소유 dev launcher/Vite 43544/44448, root 41408/27836, subpath 32152/28268은
+각각 HTTP 200 확인 후 모두 종료했고 5173/4173 리스너와 전용 브라우저가 남지 않았다.
+로그·스크린샷은 해당 검사 세션 artifacts에 보존됐으며 writer는 그 worktree를 읽거나 수정하지 않았다.
+05-01은 이 실제 호출·실행 근거를 받아 **완료, 누적 10/20**으로 확정한다.
 
 ## 후속·미확인
 
