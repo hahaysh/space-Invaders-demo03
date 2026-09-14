@@ -53,6 +53,7 @@ npm run test:e2e
 Chromium 실행 파일이 없다는 오류가 나온 경우에만 `npx playwright install chromium`으로 준비한 후 다시 실행하세요.
 테스트는 전용 브라우저에서 실제 버튼·키·DOM·Canvas를 확인합니다.
 제어 clock을 사용하는 자동 플레이는 사람의 직접 플레이나 공개 자연 시간 검증과 다릅니다.
+CI에서는 Playwright가 개발 서버를 자동 준비·종료합니다. 로컬 수동 실행에는 위 두 터미널 방식을 사용하세요.
 
 ## App 수동 실행 설정
 
@@ -86,4 +87,6 @@ Chromium 실행 파일이 없다는 오류가 나온 경우에만 `npx playwrigh
 [기술 설계](TRD.md) · [구현 계획·실제 단계 결과](IMPLEMENTATION_PLAN.md)
 
 M1/M2 실제 실행과 실패·재검사 근거는 구현 계획에 있습니다.
-05의 검증 문서·game-check Skill과 06의 Pages 배포는 별도 이슈에서 진행합니다.
+[검증 계획](TEST_PLAN.md)과 [실제 결과](TEST_RESULTS.md)는 모델·브라우저·이미지·빌드 검사를 구분합니다.
+[game-check Skill](.github/skills/game-check/SKILL.md)은 이 절차를 재사용하며 실제 인식/호출 결과는
+검증 결과에 기록합니다. Pages 공개는 이슈 #4의 후속 단계입니다.
