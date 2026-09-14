@@ -53,6 +53,9 @@ PC Chromium만 대상으로 하고 모바일·후속 07~09 기능은 제외한�
 PC 세 폭·title/playing/lost의 카드/controls/canvas 기하학·색·위계, 정상 요청 MIME를 확인한다.
 이는 테스트 측 브라우저 계측이며 제품 코드·글로벌 모델 API를 수정하지 않는다.
 긴 자동 진행은 유한 반복과 timeout을 사용하고 clock 설치·시작 경합을 피한다.
+`tests/browser/clock.js`는 navigation 전에 고정 clock 설치·정지를 마치고 이미지 준비 뒤
+첫 제어 프레임을 진행한다. 무발사 패배는 기존 56초 예산 안에서 500ms×최대112회로
+DOM 패배 상태까지 진행하며, 미도달은 실패다. 세 판 반복·동결·재시작·PC geometry를 유지한다.
 PNG 네트워크 중단으로 생긴 의도한 오류는 정상 화면의 요청 오류와 분리한다.
 
 1. Node 모델·원본 검사와 dev 전체 E2E.

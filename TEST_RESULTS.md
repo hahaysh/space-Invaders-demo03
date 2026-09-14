@@ -163,3 +163,59 @@ main push/dispatch 두 경우만 upload/deploy=true였다. 원격 GitHub 실행�
 자동 소유 서버 종료 뒤 5173/4173 리스너가 없고 전용 브라우저가 종료됐다.
 
 06-02 로컬 완료, 누적 **13/20**. 원격 Actions/PR 검사·실제 배포는 06-03에서 확인한다.
+
+## 06-03 첫 배포 실패 복구 — 2026-09-14
+
+새 App 복구 worktree의 시작 HEAD/origin/main은
+`67b7c7cf58d5d93c480573a9de13ae31bac14a84`, branch는
+`hahaysh-demo03-first-deploy-recovery`, 추적/비추적 변경 없는 상태였다.
+첫 도구 호출 `game-check`는 **loaded successfully**와 8항 context를 반환했다.
+이 세션의 실제 호출·실행이며 위의 이전 writer not found를 덮어쓰지 않는다.
+
+PR #5의 CI `34836967733`은 Node11/E2E21/build 성공, upload/deploy skipped, artifact0이었다.
+하지만 정상 merge 뒤 main push [run34837213581](https://github.com/hahaysh/space-Invaders-demo03/actions/runs/34837213581)은
+Node11 성공, E2E20 성공/1 실패였다. `loss freezes`의 `runFor(56000)` 뒤
+DOM이 playing에 머물러 패배 기대가 5초 timeout됐으며 build/upload/deploy는 skipped, artifact0이다.
+원격 실패 로그는 복구 세션 artifacts에 보존했다.
+
+수정 전 동일 loss 테스트 3회는 모두 통과했다(각55.4/55.6/56.4초).
+drawImage만 관찰한 late/early clock 비교도 두 경우 모두 적 바닥528/패배에 도달했다.
+따라서 CI의 정확 콜백 순서는 **미재현·미확정**이며 호스트 문제나 제품 결함으로 단정하지 않는다.
+다만 [Playwright clock 계약](https://playwright.dev/docs/clock)은 install을 최초 rAF 등
+시간 API 사용 전에 요구한다. 기존 navigation/게임 rAF 뒤 설치 4곳은 확인된 검사 계약 위반이다.
+공용 helper로 navigation 전 설치·정지를 완료하고 패배 대기를 같은 56초 예산의
+500ms×최대112회 DOM 관찰로 교체했다. 제품 소스/수치/PNG/manifest/lock/workflow는 불변이다.
+조사·설계는 [이슈 댓글](https://github.com/hahaysh/space-Invaders-demo03/issues/4#issuecomment-5663218700)에 보존했다.
+
+| 이 세션의 실제 실행 | 결과·범위 |
+|---|---|
+| 설치 전 `npm test` | 11/11 |
+| 설치 전 타겟 E2E | playwright 미설치로 실패, 브라우저 검사 미실행 |
+| 이후 `npm ci --no-audit --no-fund --registry=https://registry.npmjs.org` | 성공, 19 packages/3s, 기본 캐시; 새 cold-cache 근거 아님 |
+| 수정 전 `--grep "loss freezes" --repeat-each=3` | 3/3, 원격 실패를 로컬에서 재현하지 못함 |
+| 수정 후 `--grep "loss freezes\|portable PC" --repeat-each=3` | 6/6, 3.5분; retry 없이 반복, 각 loss 내부 세 판 유지 |
+| 수정 후 `npm test` | 11/11, 모델 경계/동결/재시작/원본 에셋 |
+| 수정 후 dev 전체 E2E | 21/21, 1.6분; 기존 테스트 수 유지 |
+| `npm run build` | 성공, JS `index-BQvW1aEd.js`, CSS `index-DCFtpVI4.css` |
+| root preview + TEST_PLAN 빌드 grep | 13/13, 36.1초 |
+| subpath preview + 같은 grep | 13/13, 38.2초 |
+| 독립 Chromium 로컬 자연 시간 | 시작 버튼→오른쪽250ms, 기체 x380→460→Space1500ms→30점/playing |
+
+Node24.14.1/npm10.8.3/Windows x64, 고정 Vite8.0.0/Playwright1.63.0.
+lock SHA-256 `96ee734d6bc2accaff11e959d0ab480dd5ab4ebe9b0a830b6e5b05183c176c76` 불변.
+이미지 네트워크 지연/실패, 각 decode 지연/거부, 알파 제외 다색 래스터·모델 정렬,
+카드/키 입력 비간섭/세 PC 폭 geometry를 그대로 검사했다.
+root/subpath의 두 PNG는 인라인이며 실제 decode·표시 검사 통과, 파일 요청 MIME/404·외부 요청 검사 통과.
+
+일회성 자연 시간 관찰 스크립트의 최초 MIME 판정은 dev의 `.css` import가 JavaScript 응답인 것을
+확장자만으로 판단해 실패했다. 원본 실패 JSON을 보존하고 기존 검사와 동일하게 resourceType으로
+구분한 뒤 재실행 통과했다. 제품·정규 E2E 실패가 아니며 검사 기대를 낮춘 것이 아니다.
+자연 시간 캡처를 에이전트가 직접 열어 점수30 카드, 위를 향한 청색 플레이어와 아래를 향한
+적갈색/주황갈색 적의 몸체·날개·조종석·배경 대비를 확인했다. 사람 플레이와는 별개다.
+정상 화면 console/pageerror/requestfailed/외부 요청은 없었으며 dev 두 PNG는200/image/png였다.
+
+소유 dev PID40016/5173, root preview PID36832/4173, subpath preview PID34208/4173은
+각 HTTP200 확인 후 순차 종료했다. 독립 Chromium은 finally에서 종료했다.
+공개 자연 시간/원격 복구 PR CI·main 배포는 이 로컬 기록 시점 미실행이며,
+실행 뒤 실제 commit/run/artifact/URL/방법/미확인은 이슈 #4에 우선 보존한다.
+사람 직접 플레이·OS 창 전환·App trust/Run UI·자동 지침 적용은 미확인이다.
