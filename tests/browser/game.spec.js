@@ -191,6 +191,7 @@ test('loss freezes, repeat R ignored, button restarts repeatedly with a single l
     for (let elapsed = 0; elapsed < 120000 && await page.locator('#action').isHidden(); elapsed += 1000) {
       await page.clock.runFor(1000);
     }
+    await expect(page.locator('#action')).toBeVisible();
     await expect(page.locator('#status')).toContainText('패배.');
     const frozen = await page.locator('canvas').evaluate((canvas) => canvas.toDataURL());
     await page.keyboard.down('r');
