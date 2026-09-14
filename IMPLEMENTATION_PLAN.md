@@ -99,7 +99,7 @@ App trust 수락과 Run UI 조작은 미확인으로 남기며 CLI 실행을 UI 
 - README의 명령과 manifest, App 공식 name/command 목록·triggers 부재·auto_open_in_browser를 대조했다.
   Run/Test 명령을 실제 CLI로 실행했다. App UI 적용·수락은 검사하지 않았다.
 - `npm test` 11/11, `npm run build` 성공, `npm ls --depth=0` 고정 의존성 2개 일치.
-  M1 설치는 `npm install`이었다. README의 새 체크아웃용 `npm ci`를 이번 단계에 재실행했다고 주장하지 않는다.
+  M1 설치는 `npm install`이었다. PR 검토 중 아래 lock 보완 후 `npm ci`도 실제 실행했다.
 - 같은 dist에 대해 root `http://127.0.0.1:4173/` Playwright 6/6,
   하위 경로 `http://127.0.0.1:4173/space-Invaders-demo03/` 6/6.
   각 경로의 최초 HTML/실제 시작·이동·발사/카드/240점 승리·재시작/PNG decode·다색 래스터를 검사했다.
@@ -109,11 +109,28 @@ App trust 수락과 Run UI 조작은 미확인으로 남기며 CLI 실행을 UI 
 - 빌드 PNG data URL 정확히 2개, HTML/CSS/JS HTTP 200 및 올바른 MIME, pageerror 없음.
   dev PNG 파일 URL도 각각 HTTP 200·`image/png`. 정상 브라우저 검사에서 외부/실패 요청 없음.
 - Git에 저장된 라이선스도 원본 498바이트·SHA-256 일치. diff 공백 검사 성공.
-  M3 실행 실패는 없으며 사람이 직접 수행한 UI 검토를 대신했다고 기록하지 않는다.
+  최초 M3 게임 검사는 실패가 없었으며 PR 검토 보완은 아래에 구분한다.
+  사람이 직접 수행한 UI 검토를 대신했다고 기록하지 않는다.
 - 소유 서버: M1/M2 dev PID `45948` 종료 → 실제 `npm run dev` PID `28028` HTTP 200 →
   root preview PID `12236` HTTP 200 → 하위 경로 preview PID `31628` HTTP 200.
   네 PID 모두 종료 확인했고 5173/4173 리스너 부재를 확인했다.
   독립 테스트 브라우저도 종료했으며 다른 세션 서버/탭은 조작하지 않았다.
+
+### M3 PR 검토 보완 — 공개 npm 주소
+
+실제 PR diff·lock 메타데이터 검토에서 환경 전용 미러의 resolved URL을 발견했다.
+공개 저장소의 설치 이식성을 위해 버전·integrity·나머지 메타데이터는 그대로 두고
+50개 resolved만 `https://registry.npmjs.org/` 배포 주소로 정규화했다.
+`npm install --package-lock-only --replace-registry-host=always` 시도는 주소를 바꾸지 않아 효과가 없었고,
+lock의 resolved 필드만 일괄 변환했다. 공개 tarball 50개 모두 HEAD 200을 실제 확인했다.
+처음 일회성 메타데이터 비교는 root에 불필요한 `resolved: undefined` 필드를 추가하여 실패했다.
+비교 스크립트를 바로잡은 후 모든 버전·integrity·나머지 메타데이터가 동일함을 확인했다.
+
+`npm ci --no-audit --no-fund --registry=https://registry.npmjs.org` 성공 후
+Node 11/11·Playwright 전체 14/14·build를 다시 통과했다.
+빌드 파일명/해시는 앞선 root·하위 경로 검사 때와 동일하다.
+추가 소유 dev PID `30652`, HTTP 200을 확인해 검사한 후 종료했다.
+이 보완은 M3의 설치 안내와 직접 관련되며 게임 기능·05 이후 범위를 추가하지 않는다.
 
 ### 원격 완료 기록의 위치
 
