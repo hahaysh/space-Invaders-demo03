@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { controlledReady, advanceToLoss } from './clock.js';
 
 async function ready(page) {
   await page.goto('./');
@@ -40,9 +41,7 @@ test('initial HTML score exists before scripts or first rAF', async ({ request }
 });
 
 test('real button, keyboard, boundaries, fire and blur', async ({ page }) => {
-  await ready(page);
-  await page.clock.install();
-  await page.clock.pauseAt(new Date(Date.now() + 1000));
+  await controlledReady(page);
   await page.getByRole('button', { name: '시작', exact: true }).click();
   await expect(page.locator('#score')).toHaveText('0');
   await page.clock.runFor(32);
@@ -143,9 +142,7 @@ test('failed image shows explicit error and never substitutes a shape', async ({
 });
 
 async function controlledStart(page) {
-  await ready(page);
-  await page.clock.install();
-  await page.clock.pauseAt(new Date(Date.now() + 1000));
+  await controlledReady(page);
   await page.keyboard.press('Enter');
   await page.clock.runFor(32);
 }
@@ -188,7 +185,7 @@ test('loss freezes, repeat R ignored, button restarts repeatedly with a single l
   await controlledStart(page);
   for (let round = 0; round < 3; round++) {
     await page.keyboard.down('r');
-    await page.clock.runFor(56000);
+    await advanceToLoss(page);
     await expect(page.locator('#status')).toContainText('패배.');
     const frozen = await page.locator('canvas').evaluate((canvas) => canvas.toDataURL());
     await page.keyboard.down('r');

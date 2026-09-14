@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { controlledReady, advanceToLoss } from './clock.js';
 
 for (const width of [99, 93]) {
   for (const outcome of ['delay', 'reject']) {
@@ -42,10 +43,7 @@ for (const width of [99, 93]) {
 }
 
 test('portable game keys prevent scrolling only during play and leave editing controls alone', async ({ page }) => {
-  await page.goto('./');
-  await expect(page.locator('#action')).toBeEnabled();
-  await page.clock.install();
-  await page.clock.pauseAt(new Date(Date.now() + 1000));
+  await controlledReady(page);
   await page.evaluate(() => {
     window.keyObservations = [];
     window.addEventListener('keydown', (event) => {
@@ -107,17 +105,14 @@ test('portable game keys prevent scrolling only during play and leave editing co
 
 test('portable PC card controls and canvas do not overlap in title playing or loss', async ({ page }) => {
   test.setTimeout(60000);
-  await page.goto('./');
-  await expect(page.locator('#action')).toBeEnabled();
-  await page.clock.install();
-  await page.clock.pauseAt(new Date(Date.now() + 1000));
+  await controlledReady(page);
   for (const state of ['title', 'playing', 'lost']) {
     if (state === 'playing') {
       await page.getByRole('button', { name: '시작', exact: true }).click();
       await page.clock.runFor(32);
     }
     if (state === 'lost') {
-      await page.clock.runFor(56000);
+      await advanceToLoss(page);
       await expect(page.locator('#status')).toContainText('패배.');
     }
     for (const width of [1100, 820, 640]) {
