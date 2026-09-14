@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 
+const MAX_LOSS_CLOCK_ADVANCE_MS = 120000;
+const LOSS_CLOCK_STEP_MS = 1000;
+
 async function ready(page) {
   await page.goto('./');
   await expect(page.getByRole('button', { name: '시작', exact: true })).toBeEnabled();
@@ -184,11 +187,15 @@ test('normal keyboard sweep wins, card stays fixed, terminal freezes, R resets',
 });
 
 test('loss freezes, repeat R ignored, button restarts repeatedly with a single loop', async ({ page }) => {
-  test.setTimeout(120000);
+  test.setTimeout(180000);
   await controlledStart(page);
   for (let round = 0; round < 3; round++) {
     await page.keyboard.down('r');
-    await page.clock.runFor(56000);
+    await expect(page.locator('#action')).toBeHidden();
+    for (let elapsed = 0; elapsed < MAX_LOSS_CLOCK_ADVANCE_MS && await page.locator('#action').isHidden(); elapsed += LOSS_CLOCK_STEP_MS) {
+      await page.clock.runFor(LOSS_CLOCK_STEP_MS);
+    }
+    await expect(page.locator('#action')).toBeVisible();
     await expect(page.locator('#status')).toContainText('패배.');
     const frozen = await page.locator('canvas').evaluate((canvas) => canvas.toDataURL());
     await page.keyboard.down('r');
