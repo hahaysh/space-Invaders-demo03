@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1428" />
+    <title>우주 방어</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">SPACE DEFENSE</p>
+        <h1>우주 방어</h1>
+        <p class="instructions">← → 또는 A D 이동 · Space 발사 · Enter 시작 · R 재시작</p>
+      </header>
+      <section class="hud" aria-label="게임 정보">
+        <div class="stat-card">
+          <span class="stat-label" id="score-label">점수</span>
+          <output id="score" aria-labelledby="score-label">0</output>
+        </div>
+      </section>
+      <div class="controls">
+        <p id="status" role="status">기체 이미지를 준비하고 있습니다.</p>
+        <button id="action" type="button" disabled>시작</button>
+      </div>
+      <canvas id="game" width="800" height="600" aria-label="우주 방어 게임 화면">
+        Canvas를 지원하는 PC 브라우저에서 실행해 주세요.
+      </canvas>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
