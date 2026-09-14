@@ -88,7 +88,7 @@ inspector 시작/종료 HEAD 동일, 추적파일·staged diff·status 모두 cl
 
 - Actions run `34837213581`의 build job `103953658670`은 Playwright 21개 중 20개를 통과했고,
   패배 상태 회귀 검사만 `56,000ms` 제어 시계 후 아직 playing인 간헐 실패였다.
-- 패배 상태가 될 때까지 최대 `120,000ms`를 `1,000ms` 단위로 진행하고, 테스트 제한을
+- 패배 상태가 될 때까지 최대 `120,000ms`를 `2,000ms` 단위로 진행하고, 테스트 제한을
   `180,000ms`로 늘렸다. 실제 CI 모드의 해당 검사 1/1은 41.1초에 통과했다.
 - 변경 후 `npm test` 11/11, CI 모드 전체 E2E 21/21, `npm run build`가 통과했다. 빌드된
   root와 `/space-Invaders-demo03/` preview의 선택 E2E 검사도 각각 6/6 통과했고, 소유 preview
