@@ -14,6 +14,7 @@ PC Chromium만 대상으로 하고 모바일·후속 07~09 기능은 제외한�
   `npm run preview -- --base=/space-Invaders-demo03/`의 하위 경로를 각각 검사한다.
   `GAME_URL`로 대상 URL을 설정한다. PNG 파일 route 지연/실패는 dev 전용이며
   인라인 data URL인 빌드에 같은 route가 작동한다고 간주하지 않는다.
+  빌드 대상 명령은 `npm run test:e2e -- --grep "initial HTML|real button|Enter starts|score is an HTML|normal keyboard sweep|actual decoded PNG|portable"`.
 - 06-03 공개 URL은 새 전용 브라우저와 자연 시간·실제 키/버튼으로 확인한다.
   모델/clock 주입 없이 시작·이동·발사·점수·기체 둘·카드·종료 후 재시작을 관찰한다.
   전체 승패 경계는 Node 및 제어 clock 검사와 구분하고 공개 전체 승리를 억지로 주장하지 않는다.
@@ -46,7 +47,10 @@ PC Chromium만 대상으로 하고 모바일·후속 07~09 기능은 제외한�
 ## 05-02 보강 및 실행 순서
 
 기존 검사를 먼저 실행하고 누락 경로를 최소 테스트로 연결한다. 실제 실패만 원인 확인 후 수정한다.
-스크롤/편집 UI 비간섭, decode 자체의 지연/거부, 카드 색·위계·겹침은 기존 검사와 구분해 보강한다.
+`tests/browser/verification.spec.js`의 `portable` 검사는 실제 이미지 decode 성공 뒤
+각 기체의 decode 완료만 지연/거부하고, 스크롤·편집 UI 키 비간섭과 실제 게임 그림의 불변,
+PC 세 폭·title/playing/lost의 카드/controls/canvas 기하학·색·위계, 정상 요청 MIME를 확인한다.
+이는 테스트 측 브라우저 계측이며 제품 코드·글로벌 모델 API를 수정하지 않는다.
 긴 자동 진행은 유한 반복과 timeout을 사용하고 clock 설치·시작 경합을 피한다.
 PNG 네트워크 중단으로 생긴 의도한 오류는 정상 화면의 요청 오류와 분리한다.
 

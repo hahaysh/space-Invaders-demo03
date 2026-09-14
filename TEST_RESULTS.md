@@ -79,7 +79,41 @@ inspector 시작/종료 HEAD 동일, 추적파일·staged diff·status 모두 cl
 
 ## 후속·미확인
 
-05-02 회귀 보강, 06-01 Pages 준비, 06-02 workflow, 06-03 PR/첫 배포는 미실행이다.
+06-01 Pages 준비, 06-02 workflow, 06-03 PR/첫 배포는 미실행이다.
 공개 URL·Actions run·artifact·배포 commit은 아직 없다.
 사람 직접 플레이·OS 창 전환·App trust/Run UI·Customize 화면·자동 지침 적용은 미확인이다.
 실제 Skill 호출 실패는 일반 검사 실행 성공으로 덮어쓰지 않는다.
+
+## 05-02 검증 공백 보강 — 2026-09-14
+
+고정 ref의 05-02 원문과 PRD/TEST_PLAN/inspector 결과를 대조해 사용자 위임 추천안으로
+검사 누락만 보강했다. 현재 writer의 Skill 재호출은 다시 not found였으므로
+SKILL.md를 명시적으로 읽은 **일반 대체 실행**이다. 05-01 inspector 실제 호출 성공과 구분한다.
+
+제품 결함은 재현되지 않았으며 제품 소스·PNG·lock은 바꾸지 않았다.
+`verification.spec.js`에 다음 7개 검사를 추가했다:
+기체별 네이티브 decode 성공 후 완료 지연/거부 4개, 실제 키 기본 스크롤/편집 UI 비간섭 1개,
+PC 세 폭·title/playing/lost의 card/controls/canvas 비겹침·색/위계 1개, 정상 요청 MIME/오류 1개.
+편집 UI에서 방향키·Space를 실제로 유지한 채 제어 시간을 진행해 기체/탄환 영역이 변하지 않는지도 확인했다.
+네트워크 실패와 decode 거부를 분리했으며 data URL에서도 같은 decode 검사를 실행했다.
+
+| writer 실제 실행 | 결과 |
+|---|---|
+| `npm run test:e2e -- tests/browser/verification.spec.js --reporter=list` | 최초 7/7 |
+| 입력 비간섭 그림 확인 보강 후 `npm test` | 11/11 |
+| `npm run test:e2e -- --reporter=list` | 전체 21/21, 1.7분 |
+| `npm run build` | 성공, 제품 JS/CSS 산출물 불변 |
+| root preview + TEST_PLAN 빌드 grep | 13/13, 38.6초 |
+| subpath preview + 같은 grep | 13/13, 37.9초 |
+| 전용 Chromium 자연 시간 버튼→오른쪽 250ms→Space 1500ms | 30점/playing, 요청·pageerror·외부 오류 0 |
+
+새 최종 회귀 실행은 Node11+dev21+root13+subpath13이며, 최초 보강7회와 inspector37회는 별도다.
+root/subpath 실제 PNG 래스터·비율·정렬·decode, 파일 응답 MIME/404·외부요청 부재를 확인했다.
+의도한 decode 거부/네트워크 route 오류만 예상 실패로 취급했으며 정상 자원 검사는 별도다.
+기존 04와 05-01 결과를 이번 성공으로 복제하지 않았다. 이번 보강 검사 실패·미해결 제품 결함은 0이다.
+
+writer가 자연 시간 전체 페이지 캡처를 직접 열어 청색 위방향 플레이어, 적갈색/주황갈색 아래방향 적,
+몸체·날개·조종석·배경 대비와 점수30 HTML 카드를 관찰했다. 사람의 직접 플레이는 아니다.
+소유 dev Vite PID33540, root preview38752, subpath preview20056은 각 URL HTTP200 확인 후
+순차 종료했다. 전용 Chromium은 finally에서 종료했다. 다른 세션 자원은 조작하지 않았다.
+05-02 배포 후보 검증 완료, 누적 **11/20**. 공개 URL 확인과 README 실제 URL은 06 이후 경계다.
