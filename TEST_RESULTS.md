@@ -79,7 +79,7 @@ inspector 시작/종료 HEAD 동일, 추적파일·staged diff·status 모두 cl
 
 ## 후속·미확인
 
-06-02 workflow, 06-03 PR/첫 배포는 미실행이다.
+06-03 PR/첫 배포는 미실행이다.
 공개 URL·Actions run·artifact·배포 commit은 아직 없다.
 사람 직접 플레이·OS 창 전환·App trust/Run UI·Customize 화면·자동 지침 적용은 미확인이다.
 실제 Skill 호출 실패는 일반 검사 실행 성공으로 덮어쓰지 않는다.
@@ -139,3 +139,27 @@ API가 반환한 예정 주소는 `https://hahaysh.github.io/space-Invaders-demo
 Pages status=null이며 아직 배포 run/artifact/공개 게임을 확인한 것이 아니다.
 GitHub 사람 UI 조작·승인은 미관찰이다. 권한 차단은 없었고 설정 단계만 완료, 누적 **12/20**.
 다음 06-02에서 dist 전용 최소 권한 workflow를 작성한다.
+
+## 06-02 workflow 로컬 검토 — 2026-09-14
+
+고정 06-02 원문과 실제 scripts/lock/구조를 검토하고 사용자 위임으로
+`.github/workflows/pages.yml`을 작성했다. 공식 releases/latest·tag ref·commit·action.yml·
+릴리스 본문을 직접 조회한 근거는 [이슈 #4 댓글](https://github.com/hahaysh/space-Invaders-demo03/issues/4#issuecomment-5662991757)에 보존했다.
+checkout v7.0.1/setup-node v7.0.0/upload-pages-artifact v5.0.0/deploy-pages v5.0.1을
+확인된 전체 commit SHA로 고정했다. 예측한 SHA는 쓰지 않았다.
+
+PR은 lock 기반 public npm ci→Node→Chromium→실제 E2E→build만 수행한다.
+main push/main dispatch만 dist 업로드·deploy로 진행하며 deploy는 needs build,
+github-pages 환경, pages/id-token 쓰기 권한, 취소하지 않는 deploy 전용 concurrency를 가진다.
+기본 권한은 contents read이고 PR에는 배포 권한/환경/업로드가 없다.
+CI 외부 기체 미러 다운로드, pull_request_target, 전역 concurrency는 없다.
+Playwright는 CI에서만 재사용 없는 소유 dev 서버를 자동 준비·종료하며 로컬 수동 실행은 유지한다.
+
+로컬 `CI=true`에서 새 `npm test` 11/11, 전체 E2E21/21(1.7분), build를 통과했다.
+의도한 이미지/decode 실패5건의 console 표출과 정상 화면 무오류를 구분했다.
+PyYAML 6.0.3으로 YAML 구조·권한·needs·환경·dist·40자SHA 형식을 확인했고
+PR/main push/feature push/main dispatch/feature dispatch/tag dispatch를 포함한 7개 조건을 평가했다.
+main push/dispatch 두 경우만 upload/deploy=true였다. 원격 GitHub 실행의 대체 증거는 아니다.
+자동 소유 서버 종료 뒤 5173/4173 리스너가 없고 전용 브라우저가 종료됐다.
+
+06-02 로컬 완료, 누적 **13/20**. 원격 Actions/PR 검사·실제 배포는 06-03에서 확인한다.

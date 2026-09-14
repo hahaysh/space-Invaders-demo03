@@ -10,6 +10,7 @@ PC Chromium만 대상으로 하고 모바일·후속 07~09 기능은 제외한�
   제어 delta·경계 상태 준비는 모델 검사이며 실제 브라우저 입력 증거가 아니다.
 - 소유 dev `http://127.0.0.1:5173`에서 `npm run test:e2e`: `tests/browser/game.spec.js`.
   전용 Chromium의 실제 키·버튼·DOM·Canvas·route를 사용한다. clock 자동 플레이와 자연 시간을 구분한다.
+  CI에서는 Playwright가 dev 서버를 자동 소유·준비·종료하며 기존 서버를 재사용하지 않는다.
 - `npm run build` 후 소유 preview `http://127.0.0.1:4173/`와
   `npm run preview -- --base=/space-Invaders-demo03/`의 하위 경로를 각각 검사한다.
   `GAME_URL`로 대상 URL을 설정한다. PNG 파일 route 지연/실패는 dev 전용이며

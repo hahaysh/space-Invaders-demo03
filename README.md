@@ -53,6 +53,7 @@ npm run test:e2e
 Chromium 실행 파일이 없다는 오류가 나온 경우에만 `npx playwright install chromium`으로 준비한 후 다시 실행하세요.
 테스트는 전용 브라우저에서 실제 버튼·키·DOM·Canvas를 확인합니다.
 제어 clock을 사용하는 자동 플레이는 사람의 직접 플레이나 공개 자연 시간 검증과 다릅니다.
+CI에서는 Playwright가 개발 서버를 자동 준비·종료합니다. 로컬 수동 실행에는 위 두 터미널 방식을 사용하세요.
 
 ## App 수동 실행 설정
 
