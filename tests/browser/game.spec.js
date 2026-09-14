@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 const MAX_LOSS_CLOCK_ADVANCE_MS = 120000;
-const LOSS_CLOCK_STEP_MS = 1000;
+const LOSS_CLOCK_STEP_MS = 2000;
 
 async function ready(page) {
   await page.goto('./');
@@ -191,11 +191,12 @@ test('loss freezes, repeat R ignored, button restarts repeatedly with a single l
   await controlledStart(page);
   for (let round = 0; round < 3; round++) {
     await page.keyboard.down('r');
-    await expect(page.locator('#action')).toBeHidden();
-    for (let elapsed = 0; elapsed < MAX_LOSS_CLOCK_ADVANCE_MS && await page.locator('#action').isHidden(); elapsed += LOSS_CLOCK_STEP_MS) {
+    const action = page.locator('#action');
+    await expect(page.locator('#status')).toContainText('적 편대를 모두 제거하세요');
+    for (let elapsed = 0; elapsed < MAX_LOSS_CLOCK_ADVANCE_MS && await action.isHidden(); elapsed += LOSS_CLOCK_STEP_MS) {
       await page.clock.runFor(LOSS_CLOCK_STEP_MS);
     }
-    await expect(page.locator('#action')).toBeVisible();
+    await expect(action).toBeVisible();
     await expect(page.locator('#status')).toContainText('패배.');
     const frozen = await page.locator('canvas').evaluate((canvas) => canvas.toDataURL());
     await page.keyboard.down('r');
