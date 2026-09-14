@@ -79,7 +79,7 @@ inspector 시작/종료 HEAD 동일, 추적파일·staged diff·status 모두 cl
 
 ## 후속·미확인
 
-06-01 Pages 준비, 06-02 workflow, 06-03 PR/첫 배포는 미실행이다.
+06-02 workflow, 06-03 PR/첫 배포는 미실행이다.
 공개 URL·Actions run·artifact·배포 commit은 아직 없다.
 사람 직접 플레이·OS 창 전환·App trust/Run UI·Customize 화면·자동 지침 적용은 미확인이다.
 실제 Skill 호출 실패는 일반 검사 실행 성공으로 덮어쓰지 않는다.
@@ -117,3 +117,25 @@ writer가 자연 시간 전체 페이지 캡처를 직접 열어 청색 위방�
 소유 dev Vite PID33540, root preview38752, subpath preview20056은 각 URL HTTP200 확인 후
 순차 종료했다. 전용 Chromium은 finally에서 종료했다. 다른 세션 자원은 조작하지 않았다.
 05-02 배포 후보 검증 완료, 누적 **11/20**. 공개 URL 확인과 README 실제 URL은 06 이후 경계다.
+
+## 06-01 공개 범위·Pages 준비 — 2026-09-14
+
+고정 06-01 원문과 계획·결과를 읽고 위임 설계를 검토했다.
+대상 저장소 API의 visibility=public/default_branch=main/admin=true, Actions enabled=true를 확인했다.
+추적 27개 파일은 문서·게임·검사·고정 PNG/라이선스·lock·App/Skill 설정이다.
+dist/node_modules/.env는 추적되지 않는다. 추적 텍스트의 알려진 자격증명 패턴 검사는 일치 없음이며
+포괄적 보안 감사라고 주장하지 않는다. 런타임 외부 자원 부재·상대 base·빌드 포함은 05-02 근거를 따른다.
+
+최초 GET Pages는 HTTP404(사이트 미구성), 환경 목록은 0개였다.
+따라서 기존 reviewer/대기 보호를 제거하지 않고, 위임 승인된 최소 설정을 API로 생성했다.
+
+- POST Pages `build_type=workflow`, 재조회 결과 workflow/public=true/https_enforced=true.
+- PUT `github-pages` 환경: protected_branches=false/custom_branch_policies=true.
+- POST 배포 브랜치 정책: name=main/type=branch.
+- 재조회 환경의 protection_rules는 branch_policy이며 reviewer/대기는 처음부터 없었다.
+  정책 목록 total_count=1, main branch만 있고 tag/다른 branch는 없다. 보호 우회는 사용하지 않았다.
+
+API가 반환한 예정 주소는 `https://hahaysh.github.io/space-Invaders-demo03/`지만
+Pages status=null이며 아직 배포 run/artifact/공개 게임을 확인한 것이 아니다.
+GitHub 사람 UI 조작·승인은 미관찰이다. 권한 차단은 없었고 설정 단계만 완료, 누적 **12/20**.
+다음 06-02에서 dist 전용 최소 권한 workflow를 작성한다.
