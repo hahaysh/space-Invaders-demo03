@@ -21,7 +21,7 @@
 |---|---|---|---|
 | 04-01 / M1 | 계획 먼저, Vite·모델/UI, 시작·이동·발사, 점수 0 카드, 플레이어 PNG·라이선스 | Node 모델 import, Playwright 키/버튼/DOM/Canvas, 이미지 route 지연·실패, build | 완료 |
 | 04-02 / M2 | 적 PNG·편대·충돌·점수·승패·완전 재시작 | 경계·중복·승리 우선·동결 모델 검사, 실제 입력·반복 재시작·blur·화면 | 완료 |
-| 04-03 / M3 | README, 공식 스키마의 수동 App 실행 설정, PR 검토·정상 병합 | root/하위 경로 로컬 검증, base/head/diff/reviews/checks 및 원격 확인 | 예정 |
+| 04-03 / M3 | README, 공식 스키마의 수동 App 실행 설정, PR 검토·정상 병합 | root/하위 경로 로컬 검증, base/head/diff/reviews/checks 및 원격 확인 | 로컬 완료; 원격 근거는 이슈 #2 |
 
 ### M1 설계 검토
 
@@ -83,6 +83,45 @@ M1 커밋 때 나온 Git 줄바꿈 경고에 따라 라이선스 원본의 체�
 - 소유 dev PID `45948` 유지. M1 원격 근거 `a81459f`, 이슈 #2 단계 댓글에 기록했다.
   Pages·공개 URL·App trust/Run UI·자동 지침 로딩은 미실행/미확인이다.
 
+### M3 설계 검토
+
+고정 SHA의 `docs/04-03-App-설정과-README.md`를 contents API raw 원문으로 읽었다.
+현재 manifest와 M1/M2 결과·계획을 검토하고
+[공식 App 설정](https://docs.github.com/copilot/reference/github-copilot-app-reference/repository-configuration)을
+직접 확인했다. `scripts`는 name/command 목록이며 triggers 없는 수동 Run/Test만 둔다.
+자동 설치/삭제·지침 복제·자동화·추가 커스터마이징은 만들지 않는다.
+README는 실행/조작/에셋 출처를 안내하고 수치는 PRD로 연결한다. 공개 주소는 배포 예정으로 표기한다.
+빌드 root 및 저장소 하위 경로의 실제 decode/화면/네트워크를 확인한 후 기능 PR을 검토·정상 병합한다.
+App trust 수락과 Run UI 조작은 미확인으로 남기며 CLI 실행을 UI 검증으로 간주하지 않는다.
+
+### M3 실제 로컬 결과 — 2026-09-14
+
+- README의 명령과 manifest, App 공식 name/command 목록·triggers 부재·auto_open_in_browser를 대조했다.
+  Run/Test 명령을 실제 CLI로 실행했다. App UI 적용·수락은 검사하지 않았다.
+- `npm test` 11/11, `npm run build` 성공, `npm ls --depth=0` 고정 의존성 2개 일치.
+  M1 설치는 `npm install`이었다. README의 새 체크아웃용 `npm ci`를 이번 단계에 재실행했다고 주장하지 않는다.
+- 같은 dist에 대해 root `http://127.0.0.1:4173/` Playwright 6/6,
+  하위 경로 `http://127.0.0.1:4173/space-Invaders-demo03/` 6/6.
+  각 경로의 최초 HTML/실제 시작·이동·발사/카드/240점 승리·재시작/PNG decode·다색 래스터를 검사했다.
+  M2 dev 전체 14/14의 이미지 route 지연·실패 검사는 그대로 유지된다.
+- 하위 경로는 `npm run preview -- --base=/space-Invaders-demo03/`로 같은 산출물을 제공했다.
+  이는 로컬 마운트 검사이며 Pages 공개 검사가 아니다.
+- 빌드 PNG data URL 정확히 2개, HTML/CSS/JS HTTP 200 및 올바른 MIME, pageerror 없음.
+  dev PNG 파일 URL도 각각 HTTP 200·`image/png`. 정상 브라우저 검사에서 외부/실패 요청 없음.
+- Git에 저장된 라이선스도 원본 498바이트·SHA-256 일치. diff 공백 검사 성공.
+  M3 실행 실패는 없으며 사람이 직접 수행한 UI 검토를 대신했다고 기록하지 않는다.
+- 소유 서버: M1/M2 dev PID `45948` 종료 → 실제 `npm run dev` PID `28028` HTTP 200 →
+  root preview PID `12236` HTTP 200 → 하위 경로 preview PID `31628` HTTP 200.
+  네 PID 모두 종료 확인했고 5173/4173 리스너 부재를 확인했다.
+  독립 테스트 브라우저도 종료했으며 다른 세션 서버/탭은 조작하지 않았다.
+
+### 원격 완료 기록의 위치
+
+M1 `a81459f`, M2 `6d16797`은 각각 feature 원격 반영 후 이슈 #2에 단계 보고를 남겼다.
+M3 PR의 실제 base/head·diff·reviews/checks 검토, 정상 merge SHA, 원격 main 파일·clean 확인과
+최종 **9/20** 확정은 [기본 게임 이슈 #2](https://github.com/hahaysh/space-Invaders-demo03/issues/2)의
+최신 04-03 완료 댓글에 기록한다. 커밋 안에 자기 자신의 SHA나 미래 병합 성공을 미리 기록하지 않는다.
+
 ## 공통 진행표
 
 | 단계 ID | 상태 | 완료 근거 |
@@ -95,7 +134,7 @@ M1 커밋 때 나온 Git 줄바꿈 경고에 따라 라이선스 원본의 체�
 | 03-01 | 완료 | 문서 PR #1 merge `bd338c1` |
 | 04-01 | 완료 | M1 모델 4/4·브라우저 6/6·build |
 | 04-02 | 완료 | M2 모델 11/11·브라우저 14/14·build |
-| 04-03 | 예정 | M3, 첫 공개 배포 아님 |
+| 04-03 | 로컬 완료 | Node 11/11·root 6/6·하위 경로 6/6·build; 원격 완료는 이슈 #2 |
 | 05-01 | 미실행 | 별도 검증·배포 이슈 |
 | 05-02 | 미실행 | 별도 검증·배포 이슈 |
 | 06-01 | 미실행 | 별도 검증·배포 이슈 |
@@ -108,4 +147,5 @@ M1 커밋 때 나온 Git 줄바꿈 경고에 따라 라이선스 원본의 체�
 | 09-01 | 미실행 | 후속 이슈 |
 | 09-02 | 미실행 | 후속 이슈 |
 
-누적 완료: **8/20**. 05 Skill·검증 문서·Pages workflow와 후속 기능은 이번 범위 밖이다.
+누적 로컬 산출물·검증 완료: **9/20**. 04-03의 원격 완료 확정은 위 이슈 기록을 따른다.
+05 Skill·검증 문서·Pages workflow와 후속 기능은 이번 범위 밖이다.
