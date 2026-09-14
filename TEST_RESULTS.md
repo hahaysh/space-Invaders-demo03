@@ -84,6 +84,16 @@ inspector 시작/종료 HEAD 동일, 추적파일·staged diff·status 모두 cl
 사람 직접 플레이·OS 창 전환·App trust/Run UI·Customize 화면·자동 지침 적용은 미확인이다.
 실제 Skill 호출 실패는 일반 검사 실행 성공으로 덮어쓰지 않는다.
 
+## build CI 실패 복구 — 2026-09-14
+
+- Actions run `34837213581`의 build job `103953658670`은 Playwright 21개 중 20개를 통과했고,
+  패배 상태 회귀 검사만 `56,000ms` 제어 시계 후 아직 playing인 간헐 실패였다.
+- 패배 상태가 될 때까지 최대 `120,000ms`를 `1,000ms` 단위로 진행하고, 테스트 제한을
+  `180,000ms`로 늘렸다. 실제 CI 모드의 해당 검사 1/1은 41.1초에 통과했다.
+- 변경 후 `npm test` 11/11, CI 모드 전체 E2E 21/21, `npm run build`가 통과했다. 빌드된
+  root와 `/space-Invaders-demo03/` preview의 선택 E2E 검사도 각각 6/6 통과했고, 소유 preview
+  서버는 검사 뒤 종료했다.
+
 ## 05-02 검증 공백 보강 — 2026-09-14
 
 고정 ref의 05-02 원문과 PRD/TEST_PLAN/inspector 결과를 대조해 사용자 위임 추천안으로

@@ -184,11 +184,13 @@ test('normal keyboard sweep wins, card stays fixed, terminal freezes, R resets',
 });
 
 test('loss freezes, repeat R ignored, button restarts repeatedly with a single loop', async ({ page }) => {
-  test.setTimeout(120000);
+  test.setTimeout(180000);
   await controlledStart(page);
   for (let round = 0; round < 3; round++) {
     await page.keyboard.down('r');
-    await page.clock.runFor(56000);
+    for (let elapsed = 0; elapsed < 120000 && await page.locator('#action').isHidden(); elapsed += 1000) {
+      await page.clock.runFor(1000);
+    }
     await expect(page.locator('#status')).toContainText('패배.');
     const frozen = await page.locator('canvas').evaluate((canvas) => canvas.toDataURL());
     await page.keyboard.down('r');
