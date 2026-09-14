@@ -1,7 +1,8 @@
 # 구현 계획과 단계 기록
 
 제품 기준은 [PRD](PRD.md), 구조는 [TRD](TRD.md), 자산은 [ideation](ideation.md)를 따른다.
-이 문서는 구현 순서와 04 단계의 실제 실행 기록을 담당한다. 05에서 검증 문서를 연결한다.
+이 문서는 구현 순서와 단계별 설계 검토를 담당한다.
+05 이후 검사 항목은 [TEST_PLAN](TEST_PLAN.md), 실제 결과는 [TEST_RESULTS](TEST_RESULTS.md)에 남긴다.
 
 ## 착수·위임 검토
 
@@ -141,6 +142,15 @@ M3 PR의 실제 base/head·diff·reviews/checks 검토, 정상 merge SHA, 원격
 
 ## 공통 진행표
 
+05-01은 기본 게임 PR #3가 정상 병합된 main `db5cf95639d03ba883bc0278d1f06f1308728f5a`의
+새 App 이슈 #4 worktree에서 시작한다. 실제 원격 main과 문서·게임·README·App 설정을 확인했고,
+기능 브랜치는 `hahaysh-game-verification-first-deploy`다. 이슈 #2의 완료·캐시한계 댓글을 읽었다.
+고정 안내의 전체·에셋·05-01 원문과 기존 tests/scripts를 검토한 뒤 사용자 위임 추천안으로
+전체 PRD 확인 경로·실제 결과·최소 game-check를 분리했다.
+새 빈 캐시 공개 registry 설치와 lock 불변, Node/build의 새 결과는 TEST_RESULTS에 기록했다.
+Skill 파일 생성 후 실제 도구 호출을 시도하며, 미발견이면 보존 커밋을 같은 feature의
+읽기 전용 검사 세션으로 전달하고 writer는 기다린다. 05-02 이후는 그 결과를 받은 뒤 진행한다.
+
 | 단계 ID | 상태 | 완료 근거 |
 |---|---|---|
 | 01-01 | 완료 | 초기 커밋 `8ecece5` |
@@ -151,8 +161,8 @@ M3 PR의 실제 base/head·diff·reviews/checks 검토, 정상 merge SHA, 원격
 | 03-01 | 완료 | 문서 PR #1 merge `bd338c1` |
 | 04-01 | 완료 | M1 모델 4/4·브라우저 6/6·build |
 | 04-02 | 완료 | M2 모델 11/11·브라우저 14/14·build |
-| 04-03 | 로컬 완료 | Node 11/11·root 6/6·하위 경로 6/6·build; 원격 완료는 이슈 #2 |
-| 05-01 | 미실행 | 별도 검증·배포 이슈 |
+| 04-03 | 완료 | PR #3 merge `db5cf95`, 이슈 #2 완료 댓글 |
+| 05-01 | 환경 대기 | Skill 도구 not found; feature 보존 후 같은 base 검사 세션 요청 |
 | 05-02 | 미실행 | 별도 검증·배포 이슈 |
 | 06-01 | 미실행 | 별도 검증·배포 이슈 |
 | 06-02 | 미실행 | 별도 검증·배포 이슈 |
@@ -164,5 +174,5 @@ M3 PR의 실제 base/head·diff·reviews/checks 검토, 정상 merge SHA, 원격
 | 09-01 | 미실행 | 후속 이슈 |
 | 09-02 | 미실행 | 후속 이슈 |
 
-누적 로컬 산출물·검증 완료: **9/20**. 04-03의 원격 완료 확정은 위 이슈 기록을 따른다.
-05 Skill·검증 문서·Pages workflow와 후속 기능은 이번 범위 밖이다.
+누적 완료: **9/20**. 05-01 실제 Skill 호출 확인 전에는 10/20으로 올리지 않는다.
+이슈 #4 범위는 05~06 첫 공개까지이며, 한 번의 기록 PR은 coordinator가 맡는다. 07~09는 시작하지 않는다.
